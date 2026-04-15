@@ -33,8 +33,12 @@ function generateWeek(date) {
 
 function createDayCell(date) {
   const key = formatDate(date);
+
+  const todayKey = formatDate(new Date());
+  const isToday = key === todayKey;
+
   const isCurrentMonth =
-  date.getMonth() === state.currentDate.getMonth();
+    date.getMonth() === state.currentDate.getMonth();
 
   if (!state.data[key]) {
     state.data[key] = {
@@ -49,36 +53,24 @@ function createDayCell(date) {
   const entry = state.data[key];
 
   const div = document.createElement("div");
-  
+
   let classNames = ["day"];
 
-    if (!isCurrentMonth) {
+  if (!isCurrentMonth) {
     classNames.push("other-month");
-    } else {
+  } else {
     classNames.push("current-month");
-    }
+  }
 
-    if (isToday) {
+  if (isToday) {
     classNames.push("today");
-    }
+  }
 
-    div.className = classNames.join(" ");
+  div.className = classNames.join(" ");
 
   div.innerHTML = `
     <strong>${date.getDate()}</strong>
-
-    ${createDropdown("mood", entry, key)}
-    ${createDropdown("color", entry, key)}
-
-    ${createPeopleGroups(entry, key)}
-
-    <input placeholder="O count" value="${entry.oCount}" 
-      onchange="updateField('${key}', 'oCount', this.value)" />
-
-    <textarea placeholder="Notes"
-      onchange="updateField('${key}', 'note', this.value)">
-      ${entry.note}
-    </textarea>
+    ...
   `;
 
   return div;
@@ -176,8 +168,6 @@ function updateLabel() {
   }
 }
 
-const todayKey = formatDate(new Date());
-const isToday = key === todayKey;
 
 
 function generateMonth(date) {
