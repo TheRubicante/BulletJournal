@@ -52,8 +52,8 @@ function createDayCell(date) {
   div.innerHTML = `
     <strong>${key}</strong>
 
-    ${createDropdown("mood", entry)}
-    ${createDropdown("color", entry)}
+    ${createDropdown("mood", entry, key)}
+    ${createDropdown("color", entry, key)}
 
     ${createPeopleGroups(entry)}
 
@@ -69,11 +69,11 @@ function createDayCell(date) {
   return div;
 }
 
-function createDropdown(type, entry) {
+function createDropdown(type, entry, dateKey) {
   let options = CONFIG.dropdowns[type];
 
   return `
-    <select onchange="updateField('${formatDate(new Date())}', '${type}', this.value)">
+    <select onchange="updateField('${dateKey}', '${type}', this.value)">
       <option value="">${type}</option>
       ${options.map(o =>
         `<option value="${o}" ${entry[type] === o ? "selected" : ""}>${o}</option>`
@@ -96,7 +96,7 @@ function createPeopleGroups(entry) {
           ${entry.people[name].map((val, i) => `
             <input type="checkbox"
               ${val ? "checked" : ""}
-              onchange="updateCheckbox('${name}', ${i}, this.checked)"
+              onchange="updateCheckbox('${dateKey}', '${name}', ${i}, this.checked)"
               style="accent-color:${cfg.color}"
             />
           `).join("")}
@@ -111,10 +111,8 @@ function updateField(dateKey, field, value) {
   save();
 }
 
-function updateCheckbox(person, index, value) {
-  const key = formatDate(state.currentDate);
-
-  state.data[key].people[person][index] = value;
+function updateCheckbox(dateKey, person, index, value) {
+  state.data[dateKey].people[person][index] = value;
   save();
 }
 
@@ -142,3 +140,38 @@ document.getElementById("legend").innerHTML = `
   <p>O Count = numeric input</p>
   <p>Notes = free text</p>
 `;
+
+function renderHeader() {
+  const header = document.getElementById("weekdayHeader");
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  header.innerHTML = days.map(d => `<div>${d}</div>`).join("");
+}
+
+renderHeader();
+render();
+
+function updateLabel() {
+  const label = document.getElementById("currentLabel");
+
+  const start = getStartOfWeek(state.currentDate);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  label.textContent =
+    `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+}
+
+document.getElementById("prevBtn").onclick = () => {
+  state.currentDate.setDate(state.currentDate.getDate() - 7);
+  updateLabel();
+  render();
+};
+
+document.getElementById("nextBtn").onclick = () => {
+  state.currentDate.setDate(state.currentDate.getDate() + 7);
+  updateLabel();
+  render();
+};
+
+updateLabel();

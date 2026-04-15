@@ -21,8 +21,19 @@ body {
 
 .day {
   border: 1px solid #ccc;
-  padding: 5px;
+  padding: 8px;
   background: #fafafa;
+  font-size: 12px;
+}
+
+.day textarea {
+  width: 100%;
+  height: 50px;
+}
+
+.day input {
+  width: 100%;
+  margin-top: 4px;
 }
 
 .people-group {
@@ -32,4 +43,11 @@ body {
 
 .people-group input {
   transform: scale(0.8);
+}
+
+#weekdayHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-weight: bold;
+  margin-top: 10px;
 }
