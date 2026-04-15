@@ -135,19 +135,7 @@ function render() {
   });
 }
 
-render();
 
-document.getElementById("legendToggle").onclick = () => {
-  document.getElementById("legend").classList.toggle("hidden");
-};
-
-document.getElementById("legend").innerHTML = `
-  <h3>Sample Day</h3>
-  <p>Mood, Color = dropdowns</p>
-  <p>Checkbox rows = per person tracking</p>
-  <p>O Count = numeric input</p>
-  <p>Notes = free text</p>
-`;
 
 function renderHeader() {
   const header = document.getElementById("weekdayHeader");
@@ -156,8 +144,6 @@ function renderHeader() {
   header.innerHTML = days.map(d => `<div>${d}</div>`).join("");
 }
 
-renderHeader();
-render();
 
 function updateLabel() {
   const label = document.getElementById("currentLabel");
@@ -177,29 +163,8 @@ function updateLabel() {
   }
 }
 
-document.getElementById("prevBtn").onclick = () => {
-  if (state.view === "week") {
-    state.currentDate.setDate(state.currentDate.getDate() - 7);
-  } else {
-    state.currentDate.setMonth(state.currentDate.getMonth() - 1);
-  }
 
-  updateLabel();
-  render();
-};
 
-document.getElementById("nextBtn").onclick = () => {
-  if (state.view === "week") {
-    state.currentDate.setDate(state.currentDate.getDate() + 7);
-  } else {
-    state.currentDate.setMonth(state.currentDate.getMonth() + 1);
-  }
-
-  updateLabel();
-  render();
-};
-
-updateLabel();
 
 function generateMonth(date) {
   const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -222,9 +187,53 @@ function generateMonth(date) {
   return days;
 }
 
-document.getElementById("toggleView").onclick = () => {
-  state.view = state.view === "week" ? "month" : "week";
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("App initialized");
+
+  renderHeader();
   updateLabel();
   render();
-};
 
+  document.getElementById("legendToggle").onclick = () => {
+    document.getElementById("legend").classList.toggle("hidden");
+  };
+
+  document.getElementById("legend").innerHTML = `
+    <h3>Sample Day</h3>
+    <p>Mood, Color = dropdowns</p>
+    <p>Checkbox rows = per person tracking</p>
+    <p>O Count = numeric input</p>
+    <p>Notes = free text</p>
+  `;
+
+  document.getElementById("prevBtn").onclick = () => {
+    if (state.view === "week") {
+      state.currentDate.setDate(state.currentDate.getDate() - 7);
+    } else {
+      state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+    }
+
+    updateLabel();
+    render();
+  };
+
+  document.getElementById("nextBtn").onclick = () => {
+    if (state.view === "week") {
+      state.currentDate.setDate(state.currentDate.getDate() + 7);
+    } else {
+      state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+    }
+
+    updateLabel();
+    render();
+  };
+
+  document.getElementById("toggleView").onclick = () => {
+    console.log("Toggle clicked");
+
+    state.view = state.view === "week" ? "month" : "week";
+
+    updateLabel();
+    render();
+  };
+});
