@@ -33,6 +33,8 @@ function generateWeek(date) {
 
 function createDayCell(date) {
   const key = formatDate(date);
+  const isCurrentMonth =
+  date.getMonth() === state.currentDate.getMonth();
 
   if (!state.data[key]) {
     state.data[key] = {
@@ -47,7 +49,7 @@ function createDayCell(date) {
   const entry = state.data[key];
 
   const div = document.createElement("div");
-  div.className = "day";
+  div.className = "day" + (isCurrentMonth ? "" : " other-month");
 
   div.innerHTML = `
     <strong>${key}</strong>
@@ -120,7 +122,13 @@ function render() {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  let days = generateWeek(state.currentDate);
+  let days = [];
+
+  if (state.view === "week") {
+    days = generateWeek(state.currentDate);
+  } else {
+    days = generateMonth(state.currentDate);
+  }
 
   days.forEach(day => {
     grid.appendChild(createDayCell(day));
@@ -154,24 +162,69 @@ render();
 function updateLabel() {
   const label = document.getElementById("currentLabel");
 
-  const start = getStartOfWeek(state.currentDate);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
+  if (state.view === "week") {
+    const start = getStartOfWeek(state.currentDate);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
 
-  label.textContent =
-    `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+    label.textContent =
+      `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+  } else {
+    label.textContent = state.currentDate.toLocaleString("default", {
+      month: "long",
+      year: "numeric"
+    });
+  }
 }
 
 document.getElementById("prevBtn").onclick = () => {
-  state.currentDate.setDate(state.currentDate.getDate() - 7);
+  if (state.view === "week") {
+    state.currentDate.setDate(state.currentDate.getDate() - 7);
+  } else {
+    state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+  }
+
   updateLabel();
   render();
 };
 
 document.getElementById("nextBtn").onclick = () => {
-  state.currentDate.setDate(state.currentDate.getDate() + 7);
+  if (state.view === "week") {
+    state.currentDate.setDate(state.currentDate.getDate() + 7);
+  } else {
+    state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+  }
+
   updateLabel();
   render();
 };
 
 updateLabel();
+
+function generateMonth(date) {
+  const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+  const start = new Date(firstOfMonth);
+  start.setDate(start.getDate() - start.getDay()); // back to Sunday
+
+  const end = new Date(lastOfMonth);
+  end.setDate(end.getDate() + (6 - end.getDay())); // forward to Saturday
+
+  const days = [];
+  let current = new Date(start);
+
+  while (current <= end) {
+    days.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  return days;
+}
+
+document.getElementById("toggleView").onclick = () => {
+  state.view = state.view === "week" ? "month" : "week";
+  updateLabel();
+  render();
+};
+
