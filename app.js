@@ -49,10 +49,23 @@ function createDayCell(date) {
   const entry = state.data[key];
 
   const div = document.createElement("div");
-  div.className = "day" + (isCurrentMonth ? "" : " other-month");
+  
+  let classNames = ["day"];
+
+    if (!isCurrentMonth) {
+    classNames.push("other-month");
+    } else {
+    classNames.push("current-month");
+    }
+
+    if (isToday) {
+    classNames.push("today");
+    }
+
+    div.className = classNames.join(" ");
 
   div.innerHTML = `
-    <strong>${key}</strong>
+    <strong>${date.getDate()}</strong>
 
     ${createDropdown("mood", entry, key)}
     ${createDropdown("color", entry, key)}
@@ -163,7 +176,8 @@ function updateLabel() {
   }
 }
 
-
+const todayKey = formatDate(new Date());
+const isToday = key === todayKey;
 
 
 function generateMonth(date) {

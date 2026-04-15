@@ -52,7 +52,32 @@ body {
   margin-top: 10px;
 }
 
+/* Base day styling */
+.day {
+  border: 1px solid #ccc;
+  padding: 8px;
+  background: #fafafa;
+  font-size: 12px;
+}
+
+/* Current month (subtle outline) */
+.current-month {
+  border: 1px solid #bbb;
+}
+
+/* Other months (muted) */
 .other-month {
   background: #e9e9e9;
   opacity: 0.6;
+  border: 1px solid #ddd;
+}
+
+/* Today (strong highlight) */
+.today {
+  border: 2px solid #f1c40f;
+  background: #fffbea;
+}
+
+.today strong {
+  color: #2ecc71;
 }
