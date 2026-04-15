@@ -55,7 +55,7 @@ function createDayCell(date) {
     ${createDropdown("mood", entry, key)}
     ${createDropdown("color", entry, key)}
 
-    ${createPeopleGroups(entry)}
+    ${createPeopleGroups(entry, key)}
 
     <input placeholder="O count" value="${entry.oCount}" 
       onchange="updateField('${key}', 'oCount', this.value)" />
@@ -82,7 +82,7 @@ function createDropdown(type, entry, dateKey) {
   `;
 }
 
-function createPeopleGroups(entry) {
+function createPeopleGroups(entry, dateKey) {
   return Object.entries(CONFIG.people).map(([name, cfg]) => {
 
     if (!entry.people[name]) {
