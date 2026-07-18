@@ -4,6 +4,18 @@ let state = {
   data: JSON.parse(localStorage.getItem("tracker")) || {}
 };
 
+function hexToRGBA(color, alpha) {
+  const colors = {
+    red: [255, 0, 0],
+    purple: [128, 0, 128],
+    blue: [0, 0, 255],
+    green: [0, 128, 0]
+  };
+
+  const rgb = colors[color] || [0, 0, 0];
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
 function save() {
   localStorage.setItem("tracker", JSON.stringify(state.data));
 }
@@ -51,7 +63,7 @@ function createDayCell(date) {
   }
 
   const entry = state.data[key];
-
+ 
   const div = document.createElement("div");
 
   let classNames = ["day"];
@@ -68,10 +80,24 @@ function createDayCell(date) {
 
   div.className = classNames.join(" ");
 
-  div.innerHTML = `
-    <strong>${date.getDate()}</strong>
-    ...
-  `;
+div.innerHTML = `
+  <strong class="date-label">
+  ${date.toLocaleString("default", { month: "short" })} ${date.getDate()}
+</strong>
+
+  ${createDropdown("mood", entry, key)}
+  ${createDropdown("color", entry, key)}
+
+  ${createPeopleGroups(entry, key)}
+
+  <input placeholder="O count" value="${entry.oCount}" 
+    onchange="updateField('${key}', 'oCount', this.value)" />
+
+  <textarea placeholder="Notes"
+    onchange="updateField('${key}', 'note', this.value)">
+    ${entry.note}
+  </textarea>
+`;
 
   return div;
 }
@@ -97,19 +123,24 @@ function createPeopleGroups(entry, dateKey) {
     }
 
     return `
-      <div>
-        <small>${name}</small>
-        <div class="people-group">
-          ${entry.people[name].map((val, i) => `
-            <input type="checkbox"
-              ${val ? "checked" : ""}
-              onchange="updateCheckbox('${dateKey}', '${name}', ${i}, this.checked)"
-              style="accent-color:${cfg.color}"
-            />
-          `).join("")}
-        </div>
-      </div>
-    `;
+  <div class="person-block">
+    <div 
+      class="people-group-box"
+      style="
+        border: 1px solid ${cfg.color};
+        background: ${hexToRGBA(cfg.color, 0.12)};
+      "
+    >
+      ${entry.people[name].map((val, i) => `
+        <input type="checkbox"
+          ${val ? "checked" : ""}
+          onchange="updateCheckbox('${dateKey}', '${name}', ${i}, this.checked)"
+          style="accent-color:${cfg.color}"
+        />
+      `).join("")}
+    </div>
+  </div>
+`;
   }).join("");
 }
 

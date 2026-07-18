@@ -14,7 +14,7 @@ body {
 
 #grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 10px;
   margin-top: 20px;
 }
@@ -80,4 +80,15 @@ body {
 
 .today strong {
   color: #2ecc71;
+}
+
+.person-block {
+  margin-top: 4px;
+}
+
+.people-group-box {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 4px;
 }
