@@ -220,14 +220,16 @@ function createDayCell(date) {
   }
 
   div.className = classNames.join(" ");
+const template = getCurrentTemplate();
 
 div.innerHTML = `
   <strong class="date-label">
   ${date.toLocaleString("default", { month: "short" })} ${date.getDate()}
 </strong>
 
-  ${createDropdown("mood", entry, key)}
-  ${createDropdown("color", entry, key)}
+${template.layout.dropdowns
+    .map(dropdown => createDropdown(dropdown, entry, key))
+    .join("")}
 
   ${createPeopleGroups(entry, key)}
 
@@ -243,24 +245,27 @@ div.innerHTML = `
   return div;
 }
 
-function createDropdown(type, entry, dateKey) {
-  let options = CONFIG.dropdowns[type];
+function createDropdown(dropdown, entry, dateKey) {
+
+  let options = dropdown.options;
 
   return `
-    <select onchange="updateField('${dateKey}', '${type}', this.value)">
-      <option value="">${type}</option>
+    <select onchange="updateField('${dateKey}', '${dropdown.id}', this.value)">
+      <option value="">${dropdown.label}</option>
       ${options.map(o =>
-        `<option value="${o}" ${entry[type] === o ? "selected" : ""}>${o}</option>`
+        `<option value="${o}" ${entry[dropdown.id] === o ? "selected" : ""}>${o}</option>`
       ).join("")}
     </select>
   `;
 }
 
 function createPeopleGroups(entry, dateKey) {
-  return Object.entries(CONFIG.people).map(([name, cfg]) => {
+  const template = getCurrentTemplate();
 
-    if (!entry.people[name]) {
-      entry.people[name] = new Array(cfg.count).fill(false);
+  return template.layout.habits.map(group => {
+
+    if (!entry.people[group.id]) {
+      entry.people[group.id] = new Array(group.items.length).fill(false);
     }
 
     return `
@@ -268,15 +273,15 @@ function createPeopleGroups(entry, dateKey) {
     <div 
       class="people-group-box"
       style="
-        border: 1px solid ${cfg.color};
-        background: ${hexToRGBA(cfg.color, 0.12)};
+        border: 1px solid ${group.color};
+        background: ${hexToRGBA(group.color, 0.12)};
       "
     >
-      ${entry.people[name].map((val, i) => `
+      ${entry.people[group.id].map((val, i) => `
         <input type="checkbox"
           ${val ? "checked" : ""}
-          onchange="updateCheckbox('${dateKey}', '${name}', ${i}, this.checked)"
-          style="accent-color:${cfg.color}"
+          onchange="updateCheckbox('${dateKey}', '${group.id}', ${i}, this.checked)"
+          style="accent-color:${group.color}"
         />
       `).join("")}
     </div>
