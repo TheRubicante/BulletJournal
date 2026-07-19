@@ -215,6 +215,7 @@ function renderDayCell(date) {
     };
   }
 
+  
   const entry = state.data[key];
  
   const div = document.createElement("div");
@@ -261,6 +262,82 @@ ${template.layout.dropdowns
 
   return div;
 }
+function renderTemplatePreview() {
+  const grid = document.getElementById("grid");
+
+  const template = getCurrentTemplate();
+
+  grid.innerHTML = "";
+
+  const preview = document.createElement("div");
+  preview.className = "template-preview";
+
+  preview.innerHTML = `
+    <strong class="template-title">
+      Template
+    </strong>
+
+    <div class="template-section">
+      <h4>Dropdowns</h4>
+
+      ${template.layout.dropdowns.map(dropdown => `
+        <div class="template-field">
+          <strong>${dropdown.label}</strong>
+          :
+          ${dropdown.options.join(", ")}
+        </div>
+      `).join("")}
+
+    </div>
+
+
+    <div class="template-section">
+      <h4>Habits</h4>
+
+      ${template.layout.habits.map(group => `
+        <div class="habit-template">
+          <div>
+            <strong>${group.id}</strong>
+            [${group.color}]
+          </div>
+
+          ${group.items.map(item => `
+            <div class="habit-item">
+              ${item}
+            </div>
+          `).join("")}
+
+        </div>
+      `).join("")}
+
+    </div>
+
+
+    <div class="template-section">
+      <h4>Counts</h4>
+
+      ${template.layout.counts.map(count => `
+        <div>
+          [${count.label}]
+        </div>
+      `).join("")}
+
+    </div>
+
+
+    <div class="template-section">
+      <h4>Journal Entry</h4>
+      <p>
+        A textbox will appear here.
+      </p>
+    </div>
+
+  `;
+
+  grid.appendChild(preview);
+}
+
+
 
 function renderDropdown(dropdown, entry, dateKey) {
 
@@ -354,7 +431,10 @@ function render() {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
+  updateWeekdayVisibility();
+
   if (state.mode === "template") {
+    renderTemplatePreview();
     return;
   }
 
@@ -440,12 +520,22 @@ function updateTemplateButton() {
       : "Hide Template";
 }
 
+function updateWeekdayVisibility() {
+  const header = document.getElementById("weekdayHeader");
+
+  header.style.visibility =
+    state.mode === "calendar"
+      ? "visible"
+      : "hidden";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
 
   renderHeader();
   updateLabel();
   updateTemplateButton();
+  updateWeekdayVisibility();
   render();
   updateLastSaved();
 
@@ -458,16 +548,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTemplateButton();
     render();
   };
-
-  
-
-  document.getElementById("template").innerHTML = `
-    <h3>Sample Day</h3>
-    <p>Mood, Color = dropdowns</p>
-    <p>Checkbox rows = per habit tracking</p>
-    <p>O Count = numeric input</p>
-    <p>Notes = free text</p>
-  `;
 
   document.getElementById("prevBtn").onclick = () => {
     if (state.view === "week") {
