@@ -273,3 +273,5 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLabel();
     render();
   };
+
+});
