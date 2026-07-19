@@ -1,8 +1,47 @@
+function createTemplateId() {
+  return "template_" + new Date()
+    .toISOString()
+    .replace(/[-:.TZ]/g, "");
+}
+
+function loadAppData() {
+  const saved = JSON.parse(localStorage.getItem("journalApp"));
+
+  if (saved) {
+    return saved;
+  }
+
+  const templateId = createTemplateId();
+
+  return {
+    settings: {
+      viewPreference: "month"
+    },
+
+    currentTemplateId: templateId,
+
+    templates: {
+      [templateId]: {
+        created: new Date().toISOString(),
+        named: false,
+        labels: {}
+      }
+    },
+
+    days: {}
+  };
+}
+
+let appData = loadAppData();
+
 let state = {
-  view: localStorage.getItem("viewPreference") || "month",
+  view: appData.settings.viewPreference,
+  settings: appData.settings,
   currentDate: new Date(),
   lastSaved: localStorage.getItem("lastSaved") || null,
-  data: JSON.parse(localStorage.getItem("tracker")) || {}
+  currentTemplateId: appData.currentTemplateId,
+  templates: appData.templates,
+  data: appData.days
 };
 
 function hexToRGBA(color, alpha) {
@@ -18,7 +57,17 @@ function hexToRGBA(color, alpha) {
 }
 
 function save() {
-  localStorage.setItem("tracker", JSON.stringify(state.data));
+  const appData = {
+    settings: state.settings,
+    currentTemplateId: state.currentTemplateId,
+    templates: state.templates,
+    days: state.data
+  };
+
+  localStorage.setItem(
+    "journalApp",
+    JSON.stringify(appData)
+  );
 
   state.lastSaved = new Date().toLocaleString();
 
@@ -64,6 +113,7 @@ function createDayCell(date) {
 
   if (!state.data[key]) {
     state.data[key] = {
+      templateId: state.currentTemplateId,
       mood: "",
       color: "",
       people: {},
@@ -288,7 +338,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     state.view = state.view === "week" ? "month" : "week";
 
-    localStorage.setItem("viewPreference", state.view);
+    state.settings.viewPreference = state.view;
+    save();
 
     updateLabel();
     render();
