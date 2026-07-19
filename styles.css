@@ -75,8 +75,8 @@ body {
 
 /* Today (strong highlight) */
 .today {
-  border: 2px solid #f1c40f;
-  background: #fffbea;
+  border: 2px solid #35b615;
+  background: #d9f58c;
 }
 
 .today strong {
