@@ -1,6 +1,7 @@
 let state = {
   view: localStorage.getItem("viewPreference") || "month",
   currentDate: new Date(),
+  lastSaved: localStorage.getItem("lastSaved") || null,
   data: JSON.parse(localStorage.getItem("tracker")) || {}
 };
 
@@ -18,6 +19,15 @@ function hexToRGBA(color, alpha) {
 
 function save() {
   localStorage.setItem("tracker", JSON.stringify(state.data));
+
+  state.lastSaved = new Date().toLocaleString();
+
+  localStorage.setItem(
+    "lastSaved",
+    state.lastSaved
+  );
+
+  updateLastSaved();
 }
 
 function formatDate(date) {
@@ -199,7 +209,16 @@ function updateLabel() {
   }
 }
 
+function updateLastSaved() {
+  const label = document.getElementById("lastSaved");
 
+  if (!label) return;
+
+  label.textContent =
+    state.lastSaved
+      ? `Last Saved: ${state.lastSaved}`
+      : "Last Saved: Never";
+}
 
 function generateMonth(date) {
   const firstOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -228,6 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   updateLabel();
   render();
+  updateLastSaved();
 
   document.getElementById("legendToggle").onclick = () => {
     document.getElementById("legend").classList.toggle("hidden");

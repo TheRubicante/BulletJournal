@@ -115,3 +115,15 @@ body {
 
   font-weight: bold;
 }
+
+.save-controls {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.save-controls small {
+  color: #777;
+  font-size: 11px;
+}
