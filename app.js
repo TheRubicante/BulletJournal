@@ -1,5 +1,5 @@
 let state = {
-  view: "week",
+  view: localStorage.getItem("viewPreference") || "month",
   currentDate: new Date(),
   data: JSON.parse(localStorage.getItem("tracker")) || {}
 };
@@ -268,7 +268,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     state.view = state.view === "week" ? "month" : "week";
 
+    localStorage.setItem("viewPreference", state.view);
+
     updateLabel();
     render();
   };
-});
