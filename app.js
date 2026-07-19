@@ -29,7 +29,7 @@ function loadAppData() {
           dropdowns: [
             {
               id: "mood",
-              label: "Mood",
+              label: "Energy",
               options: [
                 "happy",
                 "sad",
@@ -44,6 +44,15 @@ function loadAppData() {
                 "red",
                 "blue"
               ]
+            },
+            {
+              id: "color",
+              label: "Flavor",
+              options: [
+                "spicy",
+                "umami",
+                "gay"
+              ]
             }
           ],
 
@@ -51,7 +60,7 @@ function loadAppData() {
             {
               id: "rubi",
               label: "rubi",
-              color: "red",
+              color: "green",
               items: [
                 "Habit 1",
                 "Habit 2",
