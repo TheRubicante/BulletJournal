@@ -125,6 +125,7 @@ let appData = loadAppData();
 
 let state = {
   view: appData.settings.viewPreference,
+  mode: "calendar",
   settings: appData.settings,
   currentDate: new Date(),
   lastSaved: localStorage.getItem("lastSaved") || null,
@@ -353,6 +354,10 @@ function render() {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
+  if (state.mode === "template") {
+    return;
+  }
+
   let days = [];
 
   if (state.view === "week") {
@@ -426,17 +431,35 @@ function generateMonth(date) {
   return days;
 }
 
+function updateTemplateButton() {
+  const button = document.getElementById("templateToggle");
+
+  button.textContent =
+    state.mode === "calendar"
+      ? "Show Template"
+      : "Hide Template";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
 
   renderHeader();
   updateLabel();
+  updateTemplateButton();
   render();
   updateLastSaved();
 
+
+
   document.getElementById("templateToggle").onclick = () => {
-    document.getElementById("template").classList.toggle("hidden");
+    state.mode = state.mode === "calendar"
+      ? "template"
+      : "calendar";
+    updateTemplateButton();
+    render();
   };
+
+  
 
   document.getElementById("template").innerHTML = `
     <h3>Sample Day</h3>
