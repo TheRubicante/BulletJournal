@@ -249,11 +249,11 @@ document.addEventListener("DOMContentLoaded", () => {
   render();
   updateLastSaved();
 
-  document.getElementById("legendToggle").onclick = () => {
-    document.getElementById("legend").classList.toggle("hidden");
+  document.getElementById("templateToggle").onclick = () => {
+    document.getElementById("template").classList.toggle("hidden");
   };
 
-  document.getElementById("legend").innerHTML = `
+  document.getElementById("template").innerHTML = `
     <h3>Sample Day</h3>
     <p>Mood, Color = dropdowns</p>
     <p>Checkbox rows = per person tracking</p>
