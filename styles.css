@@ -44,12 +44,12 @@ body {
   margin-top: 4px;
 }
 
-.people-group {
+.habit-group {
   display: flex;
   gap: 3px;
 }
 
-.people-group input {
+.habit-group input {
   transform: scale(0.8);
 }
 
@@ -83,11 +83,11 @@ body {
   color: #000000;
 }
 
-.person-block {
+.habit-block {
   margin-top: 4px;
 }
 
-.people-group-box {
+.habit-group-box {
   display: flex;
   gap: 4px;
   padding: 4px;

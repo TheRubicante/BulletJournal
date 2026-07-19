@@ -4,6 +4,17 @@ function createTemplateId() {
     .replace(/[-:.TZ]/g, "");
 }
 
+function createTemplate(layout) {
+  const id = createTemplateId();
+
+  return {
+    id,
+    created: new Date().toISOString(),
+    named: false,
+    layout
+  };
+}
+
 function loadAppData() {
   const saved = JSON.parse(localStorage.getItem("journalApp"));
 
@@ -11,22 +22,8 @@ function loadAppData() {
     return saved;
   }
 
-  const templateId = createTemplateId();
-
-  return {
-    settings: {
-      viewPreference: "month"
-    },
-
-    currentTemplateId: templateId,
-
-    templates: {
-      [templateId]: {
-        created: new Date().toISOString(),
-        named: false,
-
-        layout: {
-          dropdowns: [
+  const template = createTemplate({
+  dropdowns: [
             {
               id: "mood",
               label: "Energy",
@@ -98,12 +95,27 @@ function loadAppData() {
             }
           ],
 
-          counts: [],
+          counts: [
+            {
+              id: "completion",
+              label: "OCount"
+            }
+          ],
 
           notes: true
-        }
-      }
+});
+
+  return {
+    settings: {
+      viewPreference: "month"
     },
+
+    currentTemplateId: template.id,
+
+    templates: {
+      [template.id]: template
+    },
+    
 
     days: {}
   };
@@ -183,7 +195,7 @@ function generateWeek(date) {
   return days;
 }
 
-function createDayCell(date) {
+function renderDayCell(date) {
   const key = formatDate(date);
 
   const todayKey = formatDate(new Date());
@@ -195,10 +207,9 @@ function createDayCell(date) {
   if (!state.data[key]) {
     state.data[key] = {
       templateId: state.currentTemplateId,
-      mood: "",
-      color: "",
-      people: {},
-      oCount: "",
+      dropdowns: {},
+      habits: {},
+      counts: {},
       note: ""
     };
   }
@@ -220,7 +231,7 @@ function createDayCell(date) {
   }
 
   div.className = classNames.join(" ");
-const template = getCurrentTemplate();
+  const template = state.templates[entry.templateId] ||  getCurrentTemplate();
 
 div.innerHTML = `
   <strong class="date-label">
@@ -228,56 +239,61 @@ div.innerHTML = `
 </strong>
 
 ${template.layout.dropdowns
-    .map(dropdown => createDropdown(dropdown, entry, key))
+    .map(dropdown => renderDropdown(dropdown, entry, key))
     .join("")}
 
-  ${createPeopleGroups(entry, key)}
+  ${renderHabitGroups(entry, key)}
 
-  <input placeholder="O count" value="${entry.oCount}" 
-    onchange="updateField('${key}', 'oCount', this.value)" />
+  ${template.layout.counts
+    .map(count => renderCount(count, entry, key))
+    .join("")
+  }
 
-  <textarea placeholder="Notes"
-    onchange="updateField('${key}', 'note', this.value)">
+  ${template.layout.notes ? `
+    <textarea
+        placeholder="Notes"
+        onchange="updateNote('${key}', this.value)">
     ${entry.note}
-  </textarea>
+    </textarea>
+    ` : ""}
 `;
 
   return div;
 }
 
-function createDropdown(dropdown, entry, dateKey) {
+function renderDropdown(dropdown, entry, dateKey) {
 
   let options = dropdown.options;
 
   return `
-    <select onchange="updateField('${dateKey}', '${dropdown.id}', this.value)">
+    <select onchange="updateDropdown('${dateKey}', '${dropdown.id}', this.value)">
       <option value="">${dropdown.label}</option>
       ${options.map(o =>
-        `<option value="${o}" ${entry[dropdown.id] === o ? "selected" : ""}>${o}</option>`
+        `<option value="${o}" ${entry.dropdowns[dropdown.id] === o ? "selected" : ""}>${o}</option>`
       ).join("")}
     </select>
   `;
 }
 
-function createPeopleGroups(entry, dateKey) {
-  const template = getCurrentTemplate();
+function renderHabitGroups(entry, dateKey) {
+  const template = state.templates[entry.templateId] || getCurrentTemplate();
 
   return template.layout.habits.map(group => {
 
-    if (!entry.people[group.id]) {
-      entry.people[group.id] = new Array(group.items.length).fill(false);
+    if (!entry.habits[group.id]) {
+      entry.habits[group.id] = new Array(group.items.length).fill(false);
     }
 
     return `
-  <div class="person-block">
+  <div class="habit-block">
     <div 
-      class="people-group-box"
+      class="habit-group-box"
       style="
         border: 1px solid ${group.color};
         background: ${hexToRGBA(group.color, 0.12)};
       "
     >
-      ${entry.people[group.id].map((val, i) => `
+      ${entry.habits[group.id].map((val, i) => `
         <input type="checkbox"
           ${val ? "checked" : ""}
           onchange="updateCheckbox('${dateKey}', '${group.id}', ${i}, this.checked)"
@@ -290,13 +306,46 @@ function createPeopleGroups(entry, dateKey) {
   }).join("");
 }
 
-function updateField(dateKey, field, value) {
-  state.data[dateKey][field] = value;
-  save();
+function renderCount(count, entry, dateKey) {
+
+    if (entry.counts[count.id] === undefined) {
+        entry.counts[count.id] = "";
+    }
+
+    return `
+        <input
+            type="number"
+            min="0"
+            max="99"
+            placeholder="${count.label}"
+            value="${entry.counts[count.id]}"
+            onchange="updateCount('${dateKey}','${count.id}',this.value)"
+        />
+    `;
 }
 
-function updateCheckbox(dateKey, person, index, value) {
-  state.data[dateKey].people[person][index] = value;
+//function updateField(dateKey, field, value) {
+//  state.data[dateKey].dropdowns[field] = value;
+//  save(); 
+//}
+
+function updateDropdown(dateKey, id, value) {
+    state.data[dateKey].dropdowns[id] = value;
+    save();
+}
+
+function updateCount(dateKey, id, value) {
+    state.data[dateKey].counts[id] = value;
+    save();
+}
+
+function updateNote(dateKey, value) {
+    state.data[dateKey].note = value;
+    save();
+}
+
+function updateCheckbox(dateKey, habit, index, value) {
+  state.data[dateKey].habits[habit][index] = value;
   save();
 }
 
@@ -313,7 +362,7 @@ function render() {
   }
 
   days.forEach(day => {
-    grid.appendChild(createDayCell(day));
+    grid.appendChild(renderDayCell(day));
   });
 }
 
@@ -392,7 +441,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("template").innerHTML = `
     <h3>Sample Day</h3>
     <p>Mood, Color = dropdowns</p>
-    <p>Checkbox rows = per person tracking</p>
+    <p>Checkbox rows = per habit tracking</p>
     <p>O Count = numeric input</p>
     <p>Notes = free text</p>
   `;
