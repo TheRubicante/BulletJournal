@@ -76,11 +76,11 @@ body {
 /* Today (strong highlight) */
 .today {
   border: 2px solid #35b615;
-  background: #d9f58c;
+  background: #c9dfc2;
 }
 
 .today strong {
-  color: #2ecc71;
+  color: #000000;
 }
 
 .person-block {
