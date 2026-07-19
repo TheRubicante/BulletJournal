@@ -24,7 +24,84 @@ function loadAppData() {
       [templateId]: {
         created: new Date().toISOString(),
         named: false,
-        labels: {}
+
+        layout: {
+          dropdowns: [
+            {
+              id: "mood",
+              label: "Mood",
+              options: [
+                "happy",
+                "sad",
+                "angry"
+              ]
+            },
+            {
+              id: "color",
+              label: "Color",
+              options: [
+                "green",
+                "red",
+                "blue"
+              ]
+            }
+          ],
+
+          habits: [
+            {
+              id: "rubi",
+              label: "rubi",
+              color: "red",
+              items: [
+                "Habit 1",
+                "Habit 2",
+                "Habit 3",
+                "Habit 4",
+                "Habit 5"
+              ]
+            },
+            {
+              id: "matt",
+              label: "matt",
+              color: "purple",
+              items: [
+                "Habit 1",
+                "Habit 2",
+                "Habit 3",
+                "Habit 4",
+                "Habit 5"
+              ]
+            },
+            {
+              id: "luke",
+              label: "luke",
+              color: "blue",
+              items: [
+                "Habit 1",
+                "Habit 2",
+                "Habit 3",
+                "Habit 4",
+                "Habit 5"
+              ]
+            },
+            {
+              id: "lisa",
+              label: "lisa",
+              color: "green",
+              items: [
+                "Habit 1",
+                "Habit 2",
+                "Habit 3",
+                "Habit 4",
+                "Habit 5"
+              ]
+            }
+          ],
+
+          counts: [],
+
+          notes: true
+        }
       }
     },
 
@@ -43,6 +120,10 @@ let state = {
   templates: appData.templates,
   data: appData.days
 };
+
+function getCurrentTemplate() {
+  return state.templates[state.currentTemplateId];
+}
 
 function hexToRGBA(color, alpha) {
   const colors = {
