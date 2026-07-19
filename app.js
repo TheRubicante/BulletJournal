@@ -38,15 +38,6 @@ function loadAppData() {
             },
             {
               id: "color",
-              label: "Color",
-              options: [
-                "green",
-                "red",
-                "blue"
-              ]
-            },
-            {
-              id: "color",
               label: "Flavor",
               options: [
                 "spicy",
@@ -60,7 +51,7 @@ function loadAppData() {
             {
               id: "rubi",
               label: "rubi",
-              color: "green",
+              color: "red",
               items: [
                 "Habit 1",
                 "Habit 2",
